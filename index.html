@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ポートフォリオ</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div id="loading">
+        <div class="dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+
+    <section class="hero">
+        <canvas id="starCanvas" aria-hidden="true"></canvas>
+
+        <div class="menubutton" onclick="toggle()">
+            <i></i>
+            <i></i>
+            <i></i>
+        </div>
+
+        <div class="menu">
+            <ul>
+                <li><a href="#heroContent">Top</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#works">Works</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+
+        <div class="hero-content is-hidden" id="heroContent">
+            <h1 class="hero-title">YuKi NKGWa</h1>
+            <p class="hero-subtitle">問題を解ける形に変換するエンジニア</p>
+            <p class="explain">小さく、確実に動くシステムを設計する</p>
+        </div>
+    </section>
+
+    <main>
+        <section class="about_me" id="about">
+            <div class="title">about me</div>
+            <p>
+                大学・大学院では工学分野を専攻し、<br>
+                技術を「使える形」に落とすことを意識して学んできました。<br>
+            </p>
+            <p>
+                前職ではIT企業にてPoC（概念実証）を担当し、<br>
+                量子アニーリングを用いた課題解決に従事しました。<br>
+            </p>
+            <p>
+                顧客の業務や制約を整理し、<br>
+                技術を現実の問題に適用する経験を積んできました。<br>
+            </p>
+            <p>
+                現在は個人でWebアプリやAIツールの開発にも取り組んでいます。<br>
+            </p>
+        </section>
+
+        <section class="thinking">
+            <div class="title">thinking</div>
+            <p>
+                問題をそのまま解くのではなく、<br>
+                前提と制約を整理し、<br>
+                解ける形に変換することを重視しています。<br>
+            </p>
+        </section>
+
+        <section class="works" id="works">
+            <div class="title">works</div>
+            <div id="work"></div>
+        </section>
+
+        <section class="Skills">
+            <div class="title">Skills</div>
+            <ol>
+                <li>Backend</li>
+                <p>Python / FastAPI</p>
+                <li>Frontend</li>
+                <p>HTML / CSS / JavaScript</p>
+                <li>Database</li>
+                <p>SQLite / MySQL</p>
+                <li>Infra</li>
+                <p>AWS</p>
+                <li>Others</li>
+                <p>Git / GitHub</p>
+            </ol>
+        </section>
+
+        <section class="experience">
+            <div class="title">experience</div>
+            <p>
+                IT企業にてPoC（概念実証）を担当。<br>
+            </p>
+            <p>
+                量子アニーリングを用いた課題に対し、<br>
+                要件整理から検証設計、実装までを一貫して実施。<br>
+            </p>
+            <p>
+                顧客の業務や制約を踏まえ、<br>
+                技術を実際の課題に適用するプロセスを経験。<br>
+            </p>
+        </section>
+
+        <section class="vision">
+            <div class="title">vision</div>
+            <p>
+                人の可処分時間が増える時代において、<br>
+                その時間に価値を提供できる存在を目指しています。<br>
+            </p>
+            <p>
+                エンタメ領域を軸に、<br>
+                問題設定から解決まで一貫して設計し、<br>
+                継続的にプロダクトを生み出していきます。<br>
+            </p>
+        </section>
+
+        <section class="contact" id="contact">
+
+            <div class="title">contact</div>
+            <form>
+                <label for="name">お名前:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">メールアドレス:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="message">お問い合わせ内容:</label>
+                <textarea id="message" name="message" rows="5" required></textarea>
+
+                <button type="submit">送信</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
