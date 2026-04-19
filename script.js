@@ -299,3 +299,20 @@ lists.forEach((item, index) => {
 
     work.appendChild(article);
 });
+
+window.addEventListener('load', () => {
+  if (window.location.hash === '#contact') {
+    const contactSection = document.getElementById('contact');
+    const nameInput = document.getElementById('name');
+
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    if (nameInput) {
+      setTimeout(() => {
+        nameInput.focus();
+      }, 500);
+    }
+  }
+});

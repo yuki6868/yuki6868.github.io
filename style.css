@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+}
+
 #starCanvas {
   position: fixed;
   inset: 0;
@@ -339,4 +343,31 @@ button {
 button:hover {
     background: #2c2323;
     color: white;
+}
+
+.hero-actions {
+  margin-top: 32px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.hero-link {
+  display: inline-block;
+  padding: 12px 24px;
+  border: 1px solid #2c2323;
+  color: #2c2323;
+  text-decoration: none;
+  transition: all .2s;
+}
+
+.hero-link:hover {
+  background: #2c2323;
+  color: white;
+}
+
+.hero-link.primary {
+  background: #2c2323;
+  color: white;
 }
