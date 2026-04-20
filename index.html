@@ -125,24 +125,104 @@
         <section class="contact" id="contact">
             <div class="title">Contact</div>
 
-                <form action="https://formsubmit.co/83f79843cae12a1b14960ebb8d306ca6" method="POST">
-                    <label for="name">お名前:</label>
-                    <input type="text" id="name" name="name" required>
+            <div class="contact-note">
+                <p>
+                    お仕事のご相談、YouTube関連のお問い合わせ、制作のご連絡はこちらからお願いします。<br>
+                    なお、営業・勧誘・誹謗中傷・いたずら送信には対応していません。
+                </p>
+                <p class="contact-privacy">
+                    入力いただいた情報は、お問い合わせ対応の目的でのみ使用します。<br>
+                    本フォームは FormSubmit を利用して送信されます。住所・電話番号・機密情報など、
+                    重要な個人情報は記載しないでください。
+                </p>
+            </div>
 
-                    <label for="email">メールアドレス:</label>
-                    <input type="email" id="email" name="email" required>
+            <form
+                id="contactForm"
+                action="https://formsubmit.co/83f79843cae12a1b14960ebb8d306ca6"
+                method="POST"
+            >
+                <div id="contactStatus" class="contact-status" aria-live="polite"></div>
 
-                    <label for="message">お問い合わせ内容:</label>
-                    <textarea id="message" name="message" rows="5" required></textarea>
+                <label for="name">お名前</label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    maxlength="80"
+                    autocomplete="name"
+                    required
+                >
 
-                    <input type="hidden" name="_subject" value="ポートフォリオサイトからお問い合わせ">
-                    <input type="hidden" name="_next" value="https://yuki6868.github.io/thanks.html">
-                    <input type="hidden" name="_template" value="table">
-                    <input type="text" name="_honey" style="display:none">
-                    <input type="hidden" name="_captcha" value="false">
+                <label for="email">メールアドレス</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    maxlength="120"
+                    autocomplete="email"
+                    required
+                >
 
-                    <button type="submit">送信</button>
-                </form>
+                <label for="category">お問い合わせ種別</label>
+                <select id="category" name="category" required>
+                    <option value="">選択してください</option>
+                    <option value="仕事の相談">仕事の相談</option>
+                    <option value="YouTube関連">YouTube関連</option>
+                    <option value="制作依頼">制作依頼</option>
+                    <option value="その他">その他</option>
+                </select>
+
+                <label for="subject">件名</label>
+                <input
+                    type="text"
+                    id="subject"
+                    name="subject"
+                    maxlength="120"
+                    required
+                >
+
+                <label for="message">お問い合わせ内容</label>
+                <textarea
+                    id="message"
+                    name="message"
+                    rows="6"
+                    maxlength="1500"
+                    required
+                ></textarea>
+
+                <div class="contact-policy">
+                    <p>以下の内容は送信しないでください。</p>
+                    <ul>
+                        <li>誹謗中傷、脅迫、いたずら</li>
+                        <li>営業代行・SEO営業・大量送信</li>
+                        <li>住所、電話番号、口座情報などの重要な個人情報</li>
+                    </ul>
+                </div>
+
+                <label class="consent-row">
+                    <input type="checkbox" id="consent" name="consent" required>
+                    <span>個人情報の取扱いと問い合わせポリシーに同意します</span>
+                </label>
+
+                <!-- FormSubmit settings -->
+                <input type="hidden" name="_subject" value="ポートフォリオサイトからお問い合わせ">
+                <input type="hidden" name="_next" value="https://yuki6868.github.io/thanks.html">
+                <input type="hidden" name="_template" value="table">
+                <input
+                    type="hidden"
+                    name="_blacklist"
+                    value="casino,crypto,viagra,loan,betting,poker,SEO営業,営業代行,副業勧誘"
+                >
+
+                <!-- honeypot -->
+                <div class="hp-field" aria-hidden="true">
+                    <label for="website">Website</label>
+                    <input type="text" id="website" name="_honey" tabindex="-1" autocomplete="off">
+                </div>
+
+                <button type="submit" id="contactSubmitButton">送信</button>
+            </form>
         </section>
     </main>
 </body>

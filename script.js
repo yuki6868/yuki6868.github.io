@@ -316,3 +316,118 @@ window.addEventListener('load', () => {
     }
   }
 });
+
+const contactForm = document.getElementById('contactForm');
+const contactStatus = document.getElementById('contactStatus');
+const contactSubmitButton = document.getElementById('contactSubmitButton');
+
+if (contactForm && contactStatus && contactSubmitButton) {
+  const BLOCKED_WORDS = [
+    '死ね',
+    '殺す',
+    '詐欺師',
+    'ばか',
+    'バカ',
+    'fuck',
+    'shit'
+  ];
+
+  const SUBMIT_COOLDOWN_MS = 60 * 1000;
+
+  function setContactStatus(message, type = 'error') {
+    contactStatus.textContent = message;
+    contactStatus.className = `contact-status ${type}`;
+  }
+
+  function clearContactStatus() {
+    contactStatus.textContent = '';
+    contactStatus.className = 'contact-status';
+  }
+
+  function countUrls(text) {
+    const matches = text.match(/https?:\/\/|www\./gi);
+    return matches ? matches.length : 0;
+  }
+
+  function hasBlockedWord(text) {
+    const normalized = text.toLowerCase();
+    return BLOCKED_WORDS.some((word) => normalized.includes(word.toLowerCase()));
+  }
+
+  contactForm.addEventListener('submit', (event) => {
+    clearContactStatus();
+
+    const name = document.getElementById('name')?.value.trim() ?? '';
+    const email = document.getElementById('email')?.value.trim() ?? '';
+    const category = document.getElementById('category')?.value.trim() ?? '';
+    const subject = document.getElementById('subject')?.value.trim() ?? '';
+    const message = document.getElementById('message')?.value.trim() ?? '';
+    const consent = document.getElementById('consent')?.checked ?? false;
+    const honeypot = document.getElementById('website')?.value.trim() ?? '';
+
+    const mergedText = `${name}\n${email}\n${category}\n${subject}\n${message}`;
+
+    if (honeypot !== '') {
+      event.preventDefault();
+      setContactStatus('送信できませんでした。');
+      return;
+    }
+
+    if (!consent) {
+      event.preventDefault();
+      setContactStatus('個人情報の取扱いと問い合わせポリシーへの同意が必要です。');
+      return;
+    }
+
+    if (name.length < 2) {
+      event.preventDefault();
+      setContactStatus('お名前は2文字以上で入力してください。');
+      return;
+    }
+
+    if (subject.length < 3) {
+      event.preventDefault();
+      setContactStatus('件名は3文字以上で入力してください。');
+      return;
+    }
+
+    if (message.length < 20) {
+      event.preventDefault();
+      setContactStatus('お問い合わせ内容は20文字以上で入力してください。');
+      return;
+    }
+
+    if (message.length > 1500) {
+      event.preventDefault();
+      setContactStatus('お問い合わせ内容は1500文字以内で入力してください。');
+      return;
+    }
+
+    if (hasBlockedWord(mergedText)) {
+      event.preventDefault();
+      setContactStatus('送信できない表現が含まれています。内容をご確認ください。');
+      return;
+    }
+
+    if (countUrls(mergedText) > 2) {
+      event.preventDefault();
+      setContactStatus('URLの記載は2件までにしてください。');
+      return;
+    }
+
+    const lastSubmittedAt = Number(localStorage.getItem('contact_last_submitted_at') || '0');
+    const now = Date.now();
+
+    if (now - lastSubmittedAt < SUBMIT_COOLDOWN_MS) {
+      event.preventDefault();
+      setContactStatus('短時間での連続送信はできません。少し時間を空けてください。');
+      return;
+    }
+
+    localStorage.setItem('contact_last_submitted_at', String(now));
+
+    contactSubmitButton.disabled = true;
+    contactSubmitButton.textContent = '送信中...';
+    setContactStatus('送信しています...', 'success');
+  });
+}
