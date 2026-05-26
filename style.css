@@ -549,3 +549,34 @@ button[disabled] {
         gap: 56px;
     }
 }
+
+/* ==============================
+   Site image
+============================== */
+
+.site-card {
+    overflow: hidden;
+}
+
+.site-image {
+    display: block;
+    width: 100%;
+    margin-bottom: 26px;
+    border-radius: 22px;
+    overflow: hidden;
+}
+
+.site-image img {
+    display: block;
+    width: 100%;
+    height: 260px;
+
+    object-fit: cover;
+    object-position: top;
+
+    transition: transform .5s ease;
+}
+
+.site-card:hover .site-image img {
+    transform: scale(1.03);
+}
