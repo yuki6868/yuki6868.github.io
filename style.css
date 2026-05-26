@@ -50,6 +50,7 @@ section {
 .Skills,
 .experience,
 .works,
+.sites,
 .vision,
 .contact {
     width: min(88%, 1100px);
@@ -479,4 +480,72 @@ select:focus {
 button[disabled] {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+.sites {
+    padding: 100px 0;
+}
+
+.sites .title {
+    margin-bottom: 40px;
+}
+
+.site-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 56px;
+    align-items: stretch;
+}
+
+.site-card {
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    transition: transform .35s ease;
+}
+
+.site-card:hover {
+    transform: translateY(-4px);
+}
+
+.site-tag {
+    display: inline-block;
+    margin-bottom: 18px;
+    font-size: 0.8rem;
+    color: #6b6565;
+    letter-spacing: 0.08em;
+}
+
+.site-card h3 {
+    margin: 0 0 24px;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    line-height: 1.25;
+    color: #2c2323;
+}
+
+.site-card p {
+    margin: 0 0 18px;
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: #4a4444;
+}
+
+.site-card a {
+    display: inline-block;
+    margin-top: 18px;
+    color: #2c2323;
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+}
+
+.site-card a:hover {
+    opacity: 0.65;
+}
+
+@media (max-width: 900px) {
+    .site-list {
+        grid-template-columns: 1fr;
+        gap: 56px;
+    }
 }
