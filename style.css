@@ -1067,3 +1067,130 @@ body.modal-open { overflow: hidden; }
     }
 }
 
+
+/* ==============================
+   Skill detail project groups
+============================== */
+.skill-experience-summary {
+    display: inline-block;
+    margin: 0 !important;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, .16);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .07);
+    color: #dce9ff !important;
+    font-size: .78rem !important;
+    line-height: 1.4 !important;
+}
+
+.skill-project-group {
+    padding: 34px 58px 0;
+}
+
+.skill-project-group:last-child {
+    padding-bottom: 58px;
+}
+
+.skill-project-group-heading {
+    margin-bottom: 18px;
+}
+
+.skill-project-group-heading > p {
+    margin: 0 0 6px;
+    color: #316dd9;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+}
+
+.skill-project-group-heading h3 {
+    margin: 0 0 8px;
+    color: #172033;
+    font-size: 1.22rem;
+}
+
+.skill-project-group-heading > span {
+    color: #6b7280;
+    font-size: .8rem;
+    line-height: 1.6;
+}
+
+.skill-project-group .skill-related-list {
+    padding: 0;
+}
+
+.skill-other-projects {
+    margin-top: 34px;
+    padding-top: 30px;
+    border-top: 1px solid #dfe3ea;
+}
+
+.skill-other-project-list {
+    border-top: 1px solid #dfe3ea;
+}
+
+.skill-other-project-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 24px;
+    align-items: center;
+    padding: 19px 2px;
+    border-bottom: 1px solid #dfe3ea;
+}
+
+.skill-other-project-item > div:first-child > span {
+    display: block;
+    margin-bottom: 4px;
+    color: #6b7280;
+    font-size: .67rem;
+    letter-spacing: .06em;
+}
+
+.skill-other-project-item h4 {
+    margin: 0 0 5px;
+    color: #172033;
+    font-size: .98rem;
+}
+
+.skill-other-project-item p {
+    margin: 0;
+    color: #6b7280;
+    font-size: .78rem;
+    line-height: 1.6;
+}
+
+.skill-other-project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.skill-other-project-tags span {
+    padding: 4px 7px;
+    border-radius: 999px;
+    background: rgba(49, 109, 217, .07);
+    color: #315a9c;
+    font-size: .64rem;
+    white-space: nowrap;
+}
+
+@media (max-width: 800px) {
+    .skill-project-group {
+        padding-right: 24px;
+        padding-left: 24px;
+    }
+
+    .skill-project-group:last-child {
+        padding-bottom: 40px;
+    }
+
+    .skill-other-project-item {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .skill-other-project-tags {
+        justify-content: flex-start;
+    }
+}

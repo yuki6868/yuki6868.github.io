@@ -466,18 +466,39 @@ otherWorksToggle?.addEventListener('click', () => {
   renderOtherWorks();
 });
 
+function getFeaturedProjectsBySkill(skill) {
+  return projects.filter((project) => project.skills.includes(skill));
+}
+
+function getOtherProjectsBySkill(skill) {
+  return otherProjects.filter((project) => project.skills.includes(skill));
+}
+
 function renderSkills() {
   const grid = document.getElementById('skillGrid');
   if (!grid) return;
+
+  // Skillsの入口は代表作品で使った主要技術に絞る。
+  // その他作品は、件数とSkill詳細内の補足実績として反映する。
   const names = [...new Set(projects.flatMap((project) => project.skills))]
     .filter((name) => name !== 'HTML' && name !== 'CSS' && name !== 'Supabase Realtime')
-    .sort((a, b) => projects.filter((p) => p.skills.includes(b)).length - projects.filter((p) => p.skills.includes(a)).length);
+    .sort((a, b) => {
+      const totalB = getFeaturedProjectsBySkill(b).length + getOtherProjectsBySkill(b).length;
+      const totalA = getFeaturedProjectsBySkill(a).length + getOtherProjectsBySkill(a).length;
+      return totalB - totalA;
+    });
+
   grid.innerHTML = names.map((name) => {
-    const related = projects.filter((project) => project.skills.includes(name));
+    const featuredCount = getFeaturedProjectsBySkill(name).length;
+    const otherCount = getOtherProjectsBySkill(name).length;
+    const countText = otherCount > 0
+      ? `代表 ${featuredCount}件・その他 ${otherCount}件`
+      : `代表作品 ${featuredCount}件`;
+
     return `
       <article class="skill-card">
         <button type="button" class="skill-card-button" data-skill="${escapeHtml(name)}">
-          <span class="skill-card-count">${related.length} project${related.length > 1 ? 's' : ''}</span>
+          <span class="skill-card-count">${countText}</span>
           <h3>${escapeHtml(name)}</h3>
           <p>${escapeHtml(skillDescriptions[name] || '作品の実装を通して利用した技術です。')}</p>
           <span class="skill-card-link">使用実績を見る →</span>
@@ -525,16 +546,54 @@ function closeProject() {
 }
 
 function openSkill(skill) {
-  const related = projects.filter((project) => project.skills.includes(skill));
+  const featuredProjects = getFeaturedProjectsBySkill(skill);
+  const relatedOtherProjects = getOtherProjectsBySkill(skill);
   if (!projectModal || !projectModalContent) return;
+
   projectModalContent.innerHTML = `
     <header class="project-detail-header skill-detail-header">
-      <p class="project-detail-kicker">SKILL DETAIL</p><h2 id="projectModalTitle">${escapeHtml(skill)}</h2>
+      <p class="project-detail-kicker">SKILL DETAIL</p>
+      <h2 id="projectModalTitle">${escapeHtml(skill)}</h2>
       <p>${escapeHtml(skillDescriptions[skill] || '作品の実装を通して利用した技術です。')}</p>
+      <p class="skill-experience-summary">
+        代表作品 ${featuredProjects.length}件${relatedOtherProjects.length ? `・その他の作品 ${relatedOtherProjects.length}件` : ''}で使用
+      </p>
     </header>
-    <div class="skill-related-list">
-      ${related.map((project) => `<button type="button" data-project-id="${project.id}" data-highlight-skill="${escapeHtml(skill)}"><img src="images/${project.image}" alt=""><span><strong>${escapeHtml(project.name)}</strong><small>${escapeHtml(project.summary)}</small></span><b>→</b></button>`).join('')}
-    </div>`;
+
+    <section class="skill-project-group" aria-labelledby="featuredSkillProjectsTitle">
+      <div class="skill-project-group-heading">
+        <p>FEATURED PROJECTS</p>
+        <h3 id="featuredSkillProjectsTitle">代表作品での実績</h3>
+      </div>
+      <div class="skill-related-list">
+        ${featuredProjects.map((project) => `<button type="button" data-project-id="${project.id}" data-highlight-skill="${escapeHtml(skill)}"><img src="images/${project.image}" alt=""><span><strong>${escapeHtml(project.name)}</strong><small>${escapeHtml(project.summary)}</small></span><b>→</b></button>`).join('')}
+      </div>
+    </section>
+
+    ${relatedOtherProjects.length ? `
+      <section class="skill-project-group skill-other-projects" aria-labelledby="otherSkillProjectsTitle">
+        <div class="skill-project-group-heading">
+          <p>OTHER PROJECTS</p>
+          <h3 id="otherSkillProjectsTitle">その他の使用実績</h3>
+          <span>詳細説明は省き、制作経験として簡潔に掲載しています。</span>
+        </div>
+        <div class="skill-other-project-list">
+          ${relatedOtherProjects.map((project) => `
+            <article class="skill-other-project-item">
+              <div>
+                <span>${escapeHtml(project.type)}</span>
+                <h4>${escapeHtml(project.name)}</h4>
+                <p>${escapeHtml(project.summary)}</p>
+              </div>
+              <div class="skill-other-project-tags">
+                ${project.skills.filter((name) => name !== skill).slice(0, 2).map((name) => `<span>${escapeHtml(name)}</span>`).join('')}
+              </div>
+            </article>
+          `).join('')}
+        </div>
+      </section>
+    ` : ''}`;
+
   projectModal.classList.add('is-open');
   projectModal.setAttribute('aria-hidden', 'false');
   document.body.classList.add('modal-open');
