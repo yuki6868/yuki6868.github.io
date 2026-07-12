@@ -35,51 +35,17 @@ let height = 0;
 let dpr = Math.min(window.devicePixelRatio || 1, 2);
 let centerX = 0;
 let centerY = 0;
-
-const STAR_COUNT = 260;
-const stars = [];
 let startTime = null;
 
-function resizeCanvas() {
-  width = window.innerWidth;
-  height = window.innerHeight;
+const NODE_COUNT = 150;
+const nodes = [];
 
-  dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-  canvas.width = width * dpr;
-  canvas.height = height * dpr;
-
-  canvas.style.width = width + 'px';
-  canvas.style.height = height + 'px';
-
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-  centerX = width / 2;
-  centerY = height / 2;
-
-  createStars();
-}
-
-// =======================
-// 星生成
-// =======================
 function random(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-function createStars() {
-  stars.length = 0;
-
-  for (let i = 0; i < STAR_COUNT; i++) {
-    stars.push({
-      x: random(0, width),
-      y: random(0, height),
-      size: random(0.7, 2.3),
-      alpha: random(0.3, 1),
-      pulse: random(0.8, 2.4),
-      offset: random(0, Math.PI * 2),
-    });
-  }
+function clamp(value, min = 0, max = 1) {
+  return Math.min(Math.max(value, min), max);
 }
 
 function easeInOutCubic(t) {
@@ -88,158 +54,206 @@ function easeInOutCubic(t) {
     : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
-function easeOutQuad(t) {
-  return 1 - (1 - t) * (1 - t);
+function easeOutCubic(t) {
+  return 1 - Math.pow(1 - t, 3);
 }
 
-function easeInOutSine(t) {
-  return -(Math.cos(Math.PI * t) - 1) / 2;
+function resizeCanvas() {
+  width = window.innerWidth;
+  height = window.innerHeight;
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  centerX = width / 2;
+  centerY = height / 2;
+  createNodes();
 }
 
-// =======================
-// 背景描画
-// =======================
-function drawBackground(progress) {
-  // 以前より遅く明るくする
-  const bgFadeStart = 0.50;
-  const bgFadeDuration = 0.22;
+function createNodes() {
+  nodes.length = 0;
 
-  if (progress < bgFadeStart) {
-    ctx.fillStyle = '#02040a';
-  } else {
-    const fade = Math.min((progress - bgFadeStart) / bgFadeDuration, 1);
-    const easedFade = easeInOutSine(fade);
-    const shade = Math.floor(2 + (245 - 2) * easedFade);
-    ctx.fillStyle = `rgb(${shade}, ${shade}, ${shade - 2})`;
+  const margin = Math.min(width, height) * 0.06;
+  const clusterRadiusX = Math.min(width * 0.34, 480);
+  const clusterRadiusY = Math.min(height * 0.28, 300);
+
+  for (let index = 0; index < NODE_COUNT; index += 1) {
+    const angle = random(0, Math.PI * 2);
+    const radius = Math.sqrt(Math.random());
+
+    nodes.push({
+      x: random(margin, width - margin),
+      y: random(margin, height - margin),
+      targetX: centerX + Math.cos(angle) * clusterRadiusX * radius,
+      targetY: centerY + Math.sin(angle) * clusterRadiusY * radius,
+      radius: random(0.7, 2.1),
+      alpha: random(0.45, 1),
+      pulseSpeed: random(0.8, 2.2),
+      pulseOffset: random(0, Math.PI * 2),
+      driftX: random(-7, 7),
+      driftY: random(-7, 7),
+    });
   }
+}
 
+function getNodePosition(node, progress, elapsedSeconds) {
+  const gather = easeInOutCubic(clamp((progress - 0.42) / 0.30));
+  const driftAmount = 1 - gather;
+
+  return {
+    x:
+      node.x +
+      Math.sin(elapsedSeconds * 0.22 + node.pulseOffset) * node.driftX * driftAmount +
+      (node.targetX - node.x) * gather,
+    y:
+      node.y +
+      Math.cos(elapsedSeconds * 0.20 + node.pulseOffset) * node.driftY * driftAmount +
+      (node.targetY - node.y) * gather,
+  };
+}
+
+function drawBackground(progress) {
+  const lightProgress = easeInOutCubic(clamp((progress - 0.78) / 0.18));
+  const dark = { r: 2, g: 6, b: 15 };
+  const light = { r: 245, g: 245, b: 243 };
+
+  const r = Math.round(dark.r + (light.r - dark.r) * lightProgress);
+  const g = Math.round(dark.g + (light.g - dark.g) * lightProgress);
+  const b = Math.round(dark.b + (light.b - dark.b) * lightProgress);
+
+  ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
   ctx.fillRect(0, 0, width, height);
 }
 
-function drawStars(progress, elapsedSec) {
-  const gatherStart = 0.22;
-  const gatherDuration = 0.48;
+function drawConnections(positions, progress) {
+  const connectionProgress = easeOutCubic(clamp((progress - 0.16) / 0.28));
+  const fadeProgress = easeInOutCubic(clamp((progress - 0.72) / 0.18));
+  const threshold = 54 + connectionProgress * 78;
+  const opacity = 0.22 * connectionProgress * (1 - fadeProgress);
 
-  const gatherProgress =
-    progress <= gatherStart
-      ? 0
-      : Math.min((progress - gatherStart) / gatherDuration, 1);
+  if (opacity <= 0.001) return;
 
-  const fadeStart = 0.68;
-  const fadeDuration = 0.18;
+  ctx.lineWidth = 0.65;
 
-  const fadeProgress =
-    progress <= fadeStart
-      ? 0
-      : Math.min((progress - fadeStart) / fadeDuration, 1);
+  for (let i = 0; i < positions.length; i += 1) {
+    for (let j = i + 1; j < positions.length; j += 1) {
+      const dx = positions[i].x - positions[j].x;
+      const dy = positions[i].y - positions[j].y;
+      const distance = Math.hypot(dx, dy);
 
-  stars.forEach((star) => {
-    const gatherEase = easeInOutCubic(gatherProgress);
+      if (distance > threshold) continue;
 
-    const currentX =
-      star.x + (centerX - star.x) * gatherEase;
-
-    const currentY =
-      star.y + (centerY - star.y) * gatherEase;
-
-    const flicker =
-      0.75 +
-      Math.sin(elapsedSec * star.pulse + star.offset) * 0.25;
-
-    const alpha =
-      star.alpha *
-      flicker *
-      (1 - easeOutQuad(fadeProgress));
-
-    if (alpha <= 0.01) return;
-
-    const radius =
-      star.size * (1 - gatherEase * 0.18);
-
-    ctx.beginPath();
-    ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-    ctx.arc(currentX, currentY, radius, 0, Math.PI * 2);
-    ctx.fill();
-  });
-
-  // 中央の光を「徐々に」出す
-  const glowStart = 0.38;
-  const glowDuration = 0.20;
-
-  const glowProgress =
-    progress <= glowStart
-      ? 0
-      : Math.min((progress - glowStart) / glowDuration, 1);
-
-  const glowEase = easeInOutSine(glowProgress);
-
-  if (glowEase > 0.001) {
-    const fadeEase = 1 - easeOutQuad(fadeProgress);
-
-    const coreAlpha = 0.85 * glowEase * fadeEase;
-    const glowRadius = 30 + 150 * glowEase;
-
-    const gradient = ctx.createRadialGradient(
-      centerX,
-      centerY,
-      0,
-      centerX,
-      centerY,
-      glowRadius
-    );
-
-    gradient.addColorStop(0, `rgba(255,255,255,${coreAlpha})`);
-    gradient.addColorStop(0.18, `rgba(255,255,255,${coreAlpha * 0.55})`);
-    gradient.addColorStop(0.42, `rgba(255,255,255,${coreAlpha * 0.18})`);
-    gradient.addColorStop(1, 'rgba(255,255,255,0)');
-
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, glowRadius, 0, Math.PI * 2);
-    ctx.fill();
+      const strength = 1 - distance / threshold;
+      ctx.strokeStyle = `rgba(126, 181, 255, ${opacity * strength})`;
+      ctx.beginPath();
+      ctx.moveTo(positions[i].x, positions[i].y);
+      ctx.lineTo(positions[j].x, positions[j].y);
+      ctx.stroke();
+    }
   }
 }
 
+function drawNodes(positions, progress, elapsedSeconds) {
+  const appearProgress = easeOutCubic(clamp(progress / 0.18));
+  const fadeProgress = easeInOutCubic(clamp((progress - 0.74) / 0.17));
+  const networkEmphasis = easeInOutCubic(clamp((progress - 0.32) / 0.30));
+
+  nodes.forEach((node, index) => {
+    const flicker = 0.78 + Math.sin(
+      elapsedSeconds * node.pulseSpeed + node.pulseOffset
+    ) * 0.22;
+    const stagger = clamp((progress * NODE_COUNT * 1.35 - index) / 22);
+    const alpha =
+      node.alpha *
+      flicker *
+      appearProgress *
+      easeOutCubic(stagger) *
+      (1 - fadeProgress);
+
+    if (alpha <= 0.005) return;
+
+    const radius = node.radius * (1 + networkEmphasis * 0.16);
+    const position = positions[index];
+
+    ctx.beginPath();
+    ctx.fillStyle = `rgba(225, 239, 255, ${alpha})`;
+    ctx.arc(position.x, position.y, radius, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function drawCoreGlow(progress) {
+  const glowIn = easeOutCubic(clamp((progress - 0.55) / 0.19));
+  const glowOut = easeInOutCubic(clamp((progress - 0.76) / 0.14));
+  const strength = glowIn * (1 - glowOut);
+
+  if (strength <= 0.001) return;
+
+  const radius = 70 + strength * 210;
+  const gradient = ctx.createRadialGradient(
+    centerX,
+    centerY,
+    0,
+    centerX,
+    centerY,
+    radius
+  );
+
+  gradient.addColorStop(0, `rgba(210, 233, 255, ${0.54 * strength})`);
+  gradient.addColorStop(0.20, `rgba(95, 166, 255, ${0.25 * strength})`);
+  gradient.addColorStop(0.55, `rgba(39, 105, 201, ${0.09 * strength})`);
+  gradient.addColorStop(1, 'rgba(14, 42, 82, 0)');
+
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.fill();
+}
+
 function animate(timestamp) {
-  if (!startTime) startTime = timestamp;
+  if (startTime === null) startTime = timestamp;
 
   const elapsed = timestamp - startTime;
-  const duration = 5600; 
-
-  const progress = Math.min(elapsed / duration, 1);
-  const elapsedSec = elapsed / 1000;
+  const duration = 6200;
+  const progress = clamp(elapsed / duration);
+  const elapsedSeconds = elapsed / 1000;
 
   drawBackground(progress);
-  drawStars(progress, elapsedSec);
 
-  if (progress >= 0.72) {
-    document.body.classList.add('is-white');
+  const positions = nodes.map((node) =>
+    getNodePosition(node, progress, elapsedSeconds)
+  );
+
+  drawConnections(positions, progress);
+  drawCoreGlow(progress);
+  drawNodes(positions, progress, elapsedSeconds);
+
+  if (progress >= 0.71) {
+    heroContent.classList.remove('is-hidden');
   }
 
-  if (progress >= 0.57) {
-    heroContent.classList.remove('is-hidden');
+  if (progress >= 0.80) {
+    document.body.classList.add('is-white');
   }
 
   if (progress < 1) {
     requestAnimationFrame(animate);
-  } else {
-    ctx.clearRect(0, 0, width, height);
-
-    canvas.style.opacity = '0';
-    canvas.style.transition = 'opacity 1.2s ease';
-
-    heroContent.classList.remove('is-hidden');
-    document.body.classList.add('is-white');
-
-    setTimeout(() => {
-      canvas.style.pointerEvents = 'none';
-    }, 1300);
+    return;
   }
+
+  canvas.style.opacity = '0';
+  heroContent.classList.remove('is-hidden');
+  document.body.classList.add('is-white');
+
+  window.setTimeout(() => {
+    canvas.style.pointerEvents = 'none';
+  }, 1300);
 }
 
-// =======================
-// 実行
-// =======================
 window.addEventListener('resize', resizeCanvas);
 
 resizeCanvas();
