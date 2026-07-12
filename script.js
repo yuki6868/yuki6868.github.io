@@ -314,6 +314,75 @@ const projects = [
   }
 ];
 
+const otherProjects = [
+  {
+    name: 'Retro Short Studio',
+    type: 'デスクトップアプリ',
+    summary: 'ピクセルアート制作とタイムライン編集を組み合わせた、レトロ動画制作ツール。',
+    skills: ['React', 'TypeScript', 'Electron']
+  },
+  {
+    name: 'StudyWithMeエンジン',
+    type: 'ライブラリ',
+    summary: 'ポモドーロ時間と会話・BGMなどのイベントを制御する実行エンジン。',
+    skills: ['Python', 'Pyxel', 'YAML']
+  },
+  {
+    name: '開発ダッシュボード',
+    type: 'デスクトップアプリ',
+    summary: '複数の個人開発プロジェクトとGitHubの更新状況をまとめて確認するツール。',
+    skills: ['Python', 'Electron', 'GitHub API']
+  },
+  {
+    name: '論文アナライザー',
+    type: 'Webアプリ',
+    summary: 'arXiv論文の取得・翻訳・分析・通知を一つにまとめた調査支援ツール。',
+    skills: ['Python', 'arXiv API', 'Discord']
+  },
+  {
+    name: 'AI文脈漢字入力ツール',
+    type: 'Chrome拡張',
+    summary: '読みが分からない漢字を、部首や文章の文脈から入力するブラウザ拡張。',
+    skills: ['JavaScript', 'Chrome Extension', 'AI API']
+  },
+  {
+    name: 'ウェブサイトカタログ',
+    type: 'Webアプリ',
+    summary: 'WebサイトのUI部品を選び、組み合わせをリアルタイムで確認するツール。',
+    skills: ['HTML', 'CSS', 'JavaScript']
+  },
+  {
+    name: '動画シーン管理ボード',
+    type: 'Webアプリ',
+    summary: '動画の構成・台本・制作状況をシーン単位で管理するボード。',
+    skills: ['JavaScript', 'UI設計', '状態管理']
+  },
+  {
+    name: 'AI秘書 LIFE MANAGER',
+    type: 'デスクトップアプリ',
+    summary: '目標・タスク・学習・振り返りを一元管理する個人活動基盤。',
+    skills: ['Python', 'Electron', 'AI設計']
+  },
+  {
+    name: 'DerbyViz',
+    type: 'Webアプリ',
+    summary: '競馬データを整理し、予測結果と買い方を確認する分析ツール。',
+    skills: ['Python', 'データ分析', 'Web UI']
+  },
+  {
+    name: '将棋AI',
+    type: 'AI',
+    summary: '強さだけでなく学習体験を重視して設計した教育用将棋AI。',
+    skills: ['Python', '機械学習', 'ゲームAI']
+  },
+  // {
+  //   name: '北斗無双スロット',
+  //   type: 'デスクトップアプリ',
+  //   summary: '内部抽選やモード遷移を状態として再現したスロットシミュレーター。',
+  //   skills: ['Python', '状態遷移', '確率処理']
+  // }
+];
+
 const skillDescriptions = {
   Python: 'API、CLI、データ処理など、プロダクトの中核処理を実装。',
   JavaScript: 'ブラウザUIとデスクトップ画面の動作を実装。',
@@ -357,6 +426,45 @@ function renderWorks() {
     </article>
   `).join('');
 }
+
+const OTHER_WORKS_INITIAL_COUNT = 6;
+let isOtherWorksExpanded = false;
+
+function renderOtherWorks() {
+  const grid = document.getElementById('otherWorksGrid');
+  const toggle = document.getElementById('otherWorksToggle');
+  if (!grid) return;
+
+  const visibleProjects = isOtherWorksExpanded
+    ? otherProjects
+    : otherProjects.slice(0, OTHER_WORKS_INITIAL_COUNT);
+
+  grid.innerHTML = visibleProjects.map((project) => `
+    <article class="other-work-card">
+      <div class="other-work-main">
+        <div class="other-work-meta">${escapeHtml(project.type)}</div>
+        <h3>${escapeHtml(project.name)}</h3>
+        <p>${escapeHtml(project.summary)}</p>
+      </div>
+      <div class="other-work-tags">
+        ${project.skills.slice(0, 3).map((skill) => `<span>${escapeHtml(skill)}</span>`).join('')}
+      </div>
+    </article>
+  `).join('');
+
+  if (!toggle) return;
+
+  const hasHiddenProjects = otherProjects.length > OTHER_WORKS_INITIAL_COUNT;
+  toggle.hidden = !hasHiddenProjects;
+  toggle.textContent = isOtherWorksExpanded ? '閉じる' : `さらに表示（残り${otherProjects.length - OTHER_WORKS_INITIAL_COUNT}件）`;
+  toggle.setAttribute('aria-expanded', String(isOtherWorksExpanded));
+}
+
+const otherWorksToggle = document.getElementById('otherWorksToggle');
+otherWorksToggle?.addEventListener('click', () => {
+  isOtherWorksExpanded = !isOtherWorksExpanded;
+  renderOtherWorks();
+});
 
 function renderSkills() {
   const grid = document.getElementById('skillGrid');
@@ -448,6 +556,7 @@ document.addEventListener('keydown', (event) => {
 });
 
 renderWorks();
+renderOtherWorks();
 renderSkills();
 
 window.addEventListener('load', () => {
