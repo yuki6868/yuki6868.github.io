@@ -474,37 +474,118 @@ function getOtherProjectsBySkill(skill) {
   return otherProjects.filter((project) => project.skills.includes(skill));
 }
 
+const primarySkillNames = ['Python', 'FastAPI', 'React', 'TypeScript', 'PostgreSQL', 'Docker'];
+
+const skillCategories = [
+  {
+    label: 'Backend',
+    skills: ['SQLAlchemy', 'CLI', 'pytest']
+  },
+  {
+    label: 'Frontend',
+    skills: ['JavaScript', 'Vite', 'HTML', 'CSS', '状態管理', 'UI設計']
+  },
+  {
+    label: 'Database',
+    skills: ['SQLite', 'Supabase', 'Supabase Realtime']
+  },
+  {
+    label: 'Infrastructure',
+    skills: ['Electron', 'Electron Shell', 'Vercel', 'REST API', 'GitHub API', 'Chrome Extension']
+  },
+  {
+    label: 'Other',
+    skills: ['YAML', 'Pyxel', 'arXiv API', 'Discord', 'AI API', 'AI設計', 'データ分析', 'Web UI', '機械学習', 'ゲームAI']
+  }
+];
+
+function getSkillUsageCount(skill) {
+  return getFeaturedProjectsBySkill(skill).length + getOtherProjectsBySkill(skill).length;
+}
+
+function renderSkillCard(name) {
+  const featuredCount = getFeaturedProjectsBySkill(name).length;
+  const otherCount = getOtherProjectsBySkill(name).length;
+  const countText = otherCount > 0
+    ? `代表 ${featuredCount}件・その他 ${otherCount}件`
+    : `代表作品 ${featuredCount}件`;
+
+  return `
+    <article class="skill-card">
+      <button type="button" class="skill-card-button" data-skill="${escapeHtml(name)}">
+        <span class="skill-card-count">${countText}</span>
+        <h3>${escapeHtml(name)}</h3>
+        <p>${escapeHtml(skillDescriptions[name] || '作品の実装を通して利用した技術です。')}</p>
+        <span class="skill-card-link">使用実績を見る →</span>
+      </button>
+    </article>`;
+}
+
 function renderSkills() {
   const grid = document.getElementById('skillGrid');
   if (!grid) return;
 
-  // Skillsの入口は代表作品で使った主要技術に絞る。
-  // その他作品は、件数とSkill詳細内の補足実績として反映する。
-  const names = [...new Set(projects.flatMap((project) => project.skills))]
-    .filter((name) => name !== 'HTML' && name !== 'CSS' && name !== 'Supabase Realtime')
-    .sort((a, b) => {
-      const totalB = getFeaturedProjectsBySkill(b).length + getOtherProjectsBySkill(b).length;
-      const totalA = getFeaturedProjectsBySkill(a).length + getOtherProjectsBySkill(a).length;
-      return totalB - totalA;
-    });
+  const availableSkills = new Set([
+    ...projects.flatMap((project) => project.skills),
+    ...otherProjects.flatMap((project) => project.skills)
+  ]);
 
-  grid.innerHTML = names.map((name) => {
-    const featuredCount = getFeaturedProjectsBySkill(name).length;
-    const otherCount = getOtherProjectsBySkill(name).length;
-    const countText = otherCount > 0
-      ? `代表 ${featuredCount}件・その他 ${otherCount}件`
-      : `代表作品 ${featuredCount}件`;
+  const primarySkills = primarySkillNames.filter((name) => availableSkills.has(name));
+  const categorizedSkills = new Set(skillCategories.flatMap((category) => category.skills));
+  const uncategorizedSkills = [...availableSkills]
+    .filter((name) => !primarySkillNames.includes(name) && !categorizedSkills.has(name))
+    .sort((a, b) => getSkillUsageCount(b) - getSkillUsageCount(a));
 
-    return `
-      <article class="skill-card">
-        <button type="button" class="skill-card-button" data-skill="${escapeHtml(name)}">
-          <span class="skill-card-count">${countText}</span>
-          <h3>${escapeHtml(name)}</h3>
-          <p>${escapeHtml(skillDescriptions[name] || '作品の実装を通して利用した技術です。')}</p>
-          <span class="skill-card-link">使用実績を見る →</span>
-        </button>
-      </article>`;
-  }).join('');
+  const categories = skillCategories
+    .map((category) => ({
+      ...category,
+      skills: category.skills.filter((name) => availableSkills.has(name))
+    }))
+    .filter((category) => category.skills.length > 0);
+
+  if (uncategorizedSkills.length > 0) {
+    const otherCategory = categories.find((category) => category.label === 'Other');
+    if (otherCategory) {
+      otherCategory.skills.push(...uncategorizedSkills);
+    } else {
+      categories.push({ label: 'Other', skills: uncategorizedSkills });
+    }
+  }
+
+  grid.innerHTML = `
+    <section class="primary-skills" aria-labelledby="primarySkillsTitle">
+      <div class="skills-group-heading">
+        <p>CORE SKILLS</p>
+        <h3 id="primarySkillsTitle">主要スキル</h3>
+        <span>代表的な開発経験につながる6つの技術です。</span>
+      </div>
+      <div class="primary-skill-grid">
+        ${primarySkills.map(renderSkillCard).join('')}
+      </div>
+    </section>
+
+    <section class="secondary-skills" aria-labelledby="secondarySkillsTitle">
+      <div class="skills-group-heading">
+        <p>OTHER SKILLS</p>
+        <h3 id="secondarySkillsTitle">その他のスキル</h3>
+        <span>カテゴリごとにまとめています。クリックすると使用実績を確認できます。</span>
+      </div>
+      <div class="skill-category-list">
+        ${categories.map((category) => `
+          <div class="skill-category">
+            <h4>${escapeHtml(category.label)}</h4>
+            <div class="skill-chip-list">
+              ${category.skills.map((name) => `
+                <button type="button" class="skill-chip" data-skill="${escapeHtml(name)}">
+                  <span>${escapeHtml(name)}</span>
+                  <small>${getSkillUsageCount(name)} projects</small>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </section>`;
 }
 
 const projectModal = document.getElementById('projectModal');
