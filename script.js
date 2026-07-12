@@ -259,60 +259,196 @@ window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 requestAnimationFrame(animate);
 
-const lists = [
-    {
-        name: 'memorization-tool',
-        img: 'memorization_app.png',
-        explain: '忘却曲線に基づき、最適なタイミングで復習を促す暗記支援アプリ',
-        detail: 'ユーザーの理解度に応じて復習間隔を調整し、効率的な記憶定着を実現。',
-        skills: 'FastAPI / Python / SQLite',
-    },
-    {
-        name: 'ウェブカタログビルダー',
-        img: 'site_catalog.png',
-        explain: 'パーツを選択するだけでWebサイトを構築できるアプリ',
-        detail: 'UI選択による構成生成により、非エンジニアでもサイト作成が可能。',
-        skills: 'HTML / CSS / JavaScript',
-    },
-    {
-        name: 'WAチェッカー',
-        img: 'wa_checker.png',
-        explain: '競技プログラミングにおいてWA（誤答）を引き起こす入力を検出するツール',
-        detail: '境界値や例外ケースを自動生成し、提出前のバグ検出を支援。',
-        skills: 'Python',
-    },
-    {
-        name: '論文分析AI',
-        img: 'paper_analyzer.png',
-        explain: 'arXiv論文を解析し、論文同士の関係性を可視化するアプリ',
-        detail: 'キーワード・引用関係を基に論文マップを生成し、研究理解を支援。',
-        skills: 'Python / FastAPI / Network分析',
-    },
+const projects = [
+  {
+    id: 'memorization-tool',
+    name: 'memorization_tool',
+    image: 'memorization_app.png',
+    summary: '復習すべき内容を、その日にすぐ取り出せる暗記支援デスクトップアプリ。',
+    problem: '資格勉強では、復習のタイミングをExcelや手書きで管理すると、今日復習する項目を毎回探す必要があり、管理そのものが負担になる。',
+    approach: 'FastAPI本格入門のメモアプリを土台に、初めてのアプリ開発として復習管理へ作り替えた。',
+    solution: '検索時に全項目の予定日を毎回計算するのではなく、登録時点で1週間後・2か月後などの復習予定データもDBへ追加する設計にした。',
+    result: '当日分の予定日だけを検索できるため、復習対象を素早く取り出せる構成になった。SQLiteによるDB設計とElectronによるデスクトップ化にも初挑戦した。',
+    challenges: ['初めてのWebアプリ開発', '初めてのデータベース導入', 'デスクトップアプリ化'],
+    skills: ['Python', 'JavaScript', 'FastAPI', 'SQLite', 'Electron', 'HTML', 'CSS'],
+    categories: { language: ['Python', 'JavaScript'], framework: ['FastAPI'], database: ['SQLite'], infrastructure: ['Electron'], ai: ['なし'], other: ['HTML', 'CSS'] }
+  },
+  {
+    id: 'competitive-debug-studio',
+    name: 'Competitive Debug Studio',
+    image: 'wa_checker.png',
+    summary: '競技プログラミングのWA原因を、ランダムテストと実行分析から探すCLIツール。',
+    problem: 'WAになったコードは、どの入力で間違えるのかを人手だけで特定するのが難しい。',
+    approach: '正解コードと対象コードを同じ入力で実行し、出力差分が生じるケースを自動で探す仕組みを考えた。',
+    solution: 'ランダムテストケース生成に加えて、関数の依存関係や呼び出し回数も確認できるようにし、競技プログラミング以外のコード調査にも使える構成にした。',
+    result: '失敗入力の探索とコード構造の確認を一つのCLIで行えるようにした。',
+    challenges: ['ランダムテストケース生成', '関数依存関係の可視化', '呼び出し回数の計測'],
+    skills: ['Python', 'CLI', 'YAML'],
+    categories: { language: ['Python'], framework: ['なし'], database: ['なし'], infrastructure: ['CLIツール'], ai: ['なし'], other: ['YAML'] }
+  },
+  {
+    id: 'knowledge-hub',
+    name: 'Knowledge Hub',
+    image: 'site_catalog.png',
+    summary: 'PCとスマートフォンで同じ知識カードを保存・閲覧できる同期型メモアプリ。',
+    problem: '日々の学習や調査で得た知識を、場所や端末を問わず保存し、同じデータとして見られる環境が必要だった。',
+    approach: 'Web版とデスクトップ版で別々のデータを持たず、Supabaseを共通の保存先にする構成を採用した。',
+    solution: 'ReactとViteでフロントエンドを構築し、Supabase Realtimeで同期。Web版はVercelへデプロイし、Electron Shellのデスクトップ版からも同じデータへアクセスできるようにした。',
+    result: 'PCとスマートフォン間で知識カードを共有できるようになった。特に、スマートフォンから安全にアクセスできる公開方法と同期設計を検討・実装した。',
+    challenges: ['端末間のデータ同期', 'スマートフォンからのアクセス', 'Web版とデスクトップ版のデータ共通化'],
+    skills: ['JavaScript', 'TypeScript', 'React', 'Vite', 'Supabase', 'Vercel', 'Electron Shell', 'Supabase Realtime'],
+    categories: { language: ['JavaScript', 'TypeScript'], framework: ['React', 'Vite'], database: ['Supabase'], infrastructure: ['Vercel', 'Electron Shell'], ai: ['なし'], other: ['Supabase Realtime'] }
+  },
+  {
+    id: 'design-hub',
+    name: 'Design Hub',
+    image: 'ai-site.png',
+    summary: '分散しがちな設計情報を一元管理し、設計を思考活動として支援する開発ツール。',
+    problem: 'システム開発では要件、画面、API、DBなどの設計成果物を個別に管理しやすく、変更時に整合性が崩れやすい。',
+    approach: '設計書を単に作成するのではなく、共通情報を一元管理しながら、利用者が考えやすいUIを提供することを目標にした。',
+    solution: 'FastAPI・React・PostgreSQLで構成し、SQLAlchemyを利用。PostgreSQL環境はDockerで管理し、将来的なSupabase移行も考慮した境界を設けている。',
+    result: '設計情報を統合する基盤は構築中。思考しやすいUIについては答えを固定せず、試作と検証を続けている。',
+    challenges: ['設計成果物間の整合性', '思考を妨げないUI', '将来のSupabase移行'],
+    skills: ['Python', 'TypeScript', 'FastAPI', 'React', 'Vite', 'PostgreSQL', 'Docker', 'REST API', 'SQLAlchemy'],
+    categories: { language: ['Python', 'TypeScript'], framework: ['FastAPI', 'React', 'Vite'], database: ['PostgreSQL'], infrastructure: ['Docker', 'REST API'], ai: ['実装予定'], other: ['SQLAlchemy'] }
+  }
 ];
 
-lists.forEach((item, index) => {
-    const article = document.createElement('article');
-    article.className = 'work-item';
+const skillDescriptions = {
+  Python: 'API、CLI、データ処理など、プロダクトの中核処理を実装。',
+  JavaScript: 'ブラウザUIとデスクトップ画面の動作を実装。',
+  TypeScript: '型を使ってフロントエンドの変更に強い構成を設計。',
+  FastAPI: 'REST API、入力検証、データアクセスを実装。',
+  React: '状態に応じて変化する編集・閲覧UIを構築。',
+  Vite: 'React開発環境とビルド構成を整備。',
+  SQLite: '小規模アプリの永続化と検索を設計。',
+  PostgreSQL: '設計情報を扱うリレーショナルDBとして利用。',
+  Supabase: '認証・DB・端末間同期の共通基盤として利用。',
+  Electron: 'Web技術でデスクトップアプリ化。',
+  'Electron Shell': 'Web版と同じデータを利用するデスクトップ版を構築。',
+  Docker: 'PostgreSQLを含む開発環境を再現可能に管理。',
+  Vercel: 'スマートフォンからアクセスできるWeb版を公開。',
+  'REST API': 'フロントエンドとバックエンドの責務を分離。',
+  SQLAlchemy: 'Python側のDBアクセスとモデル管理に利用。',
+  CLI: '画面を必要としない検証ツールとして提供。',
+  YAML: '設定やテスト条件を読み書きしやすい形式で管理。'
+};
 
-    if (index % 2 === 1) {
-        article.classList.add('reverse');
-    }
+function escapeHtml(value) {
+  return String(value).replace(/[&<>'"]/g, (character) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  })[character]);
+}
 
-    article.innerHTML = `
-        <div class="work-text">
-            <h2>${item.name}</h2>
-            <p>${item.explain}</p>
-            <p>${item.detail}</p>
-            <p class="tech">Tech: ${item.skills}</p>
+function renderWorks() {
+  if (!work) return;
+  work.innerHTML = projects.map((project) => `
+    <article class="work-card" data-project-id="${project.id}">
+      <button class="work-card-button" type="button" data-project-id="${project.id}" aria-label="${escapeHtml(project.name)}の詳細を見る">
+        <div class="work-card-image"><img src="images/${project.image}" alt="${escapeHtml(project.name)}"></div>
+        <div class="work-card-body">
+          <p class="work-card-kicker">Project 0${projects.indexOf(project) + 1}</p>
+          <h2>${escapeHtml(project.name)}</h2>
+          <p>${escapeHtml(project.summary)}</p>
+          <div class="tag-list">${project.skills.slice(0, 4).map((skill) => `<span>${escapeHtml(skill)}</span>`).join('')}</div>
+          <span class="work-card-link">課題と解決を見る <span aria-hidden="true">→</span></span>
         </div>
+      </button>
+    </article>
+  `).join('');
+}
 
-        <div class="work-image">
-            <img src="images/${item.img}" alt="${item.name}">
-        </div>
-    `;
+function renderSkills() {
+  const grid = document.getElementById('skillGrid');
+  if (!grid) return;
+  const names = [...new Set(projects.flatMap((project) => project.skills))]
+    .filter((name) => name !== 'HTML' && name !== 'CSS' && name !== 'Supabase Realtime')
+    .sort((a, b) => projects.filter((p) => p.skills.includes(b)).length - projects.filter((p) => p.skills.includes(a)).length);
+  grid.innerHTML = names.map((name) => {
+    const related = projects.filter((project) => project.skills.includes(name));
+    return `
+      <article class="skill-card">
+        <button type="button" class="skill-card-button" data-skill="${escapeHtml(name)}">
+          <span class="skill-card-count">${related.length} project${related.length > 1 ? 's' : ''}</span>
+          <h3>${escapeHtml(name)}</h3>
+          <p>${escapeHtml(skillDescriptions[name] || '作品の実装を通して利用した技術です。')}</p>
+          <span class="skill-card-link">使用実績を見る →</span>
+        </button>
+      </article>`;
+  }).join('');
+}
 
-    work.appendChild(article);
+const projectModal = document.getElementById('projectModal');
+const projectModalContent = document.getElementById('projectModalContent');
+
+function openProject(projectId, highlightedSkill = '') {
+  const project = projects.find((item) => item.id === projectId);
+  if (!project || !projectModal || !projectModalContent) return;
+  const categoryLabels = { language: '言語', framework: 'フレームワーク', database: 'データベース', infrastructure: 'インフラ', ai: 'AI', other: 'その他' };
+  projectModalContent.innerHTML = `
+    <header class="project-detail-header">
+      <p class="project-detail-kicker">PROJECT DETAIL</p>
+      <h2 id="projectModalTitle">${escapeHtml(project.name)}</h2>
+      <p>${escapeHtml(project.summary)}</p>
+      ${highlightedSkill ? `<p class="skill-entry-note">Skillsから「${escapeHtml(highlightedSkill)}」の実績として開いています。</p>` : ''}
+      <div class="tag-list">${project.skills.map((skill) => `<span class="${skill === highlightedSkill ? 'is-highlighted' : ''}">${escapeHtml(skill)}</span>`).join('')}</div>
+    </header>
+    <div class="project-detail-visual"><img src="images/${project.image}" alt="${escapeHtml(project.name)}"></div>
+    <div class="project-detail-flow">
+      <section><span>01</span><h3>課題</h3><p>${escapeHtml(project.problem)}</p></section>
+      <section><span>02</span><h3>考えたこと</h3><p>${escapeHtml(project.approach)}</p></section>
+      <section><span>03</span><h3>解決方法</h3><p>${escapeHtml(project.solution)}</p></section>
+      <section><span>04</span><h3>結果・現在地</h3><p>${escapeHtml(project.result)}</p></section>
+    </div>
+    <section class="project-detail-section"><h3>工夫・挑戦</h3><ul>${project.challenges.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>
+    <section class="project-detail-section"><h3>使用技術</h3><div class="technology-groups">${Object.entries(project.categories).map(([key, values]) => `<div><span>${categoryLabels[key]}</span><strong>${values.map(escapeHtml).join(' / ')}</strong></div>`).join('')}</div></section>
+  `;
+  projectModal.classList.add('is-open');
+  projectModal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('modal-open');
+  projectModal.querySelector('.project-modal-close')?.focus();
+}
+
+function closeProject() {
+  if (!projectModal) return;
+  projectModal.classList.remove('is-open');
+  projectModal.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('modal-open');
+}
+
+function openSkill(skill) {
+  const related = projects.filter((project) => project.skills.includes(skill));
+  if (!projectModal || !projectModalContent) return;
+  projectModalContent.innerHTML = `
+    <header class="project-detail-header skill-detail-header">
+      <p class="project-detail-kicker">SKILL DETAIL</p><h2 id="projectModalTitle">${escapeHtml(skill)}</h2>
+      <p>${escapeHtml(skillDescriptions[skill] || '作品の実装を通して利用した技術です。')}</p>
+    </header>
+    <div class="skill-related-list">
+      ${related.map((project) => `<button type="button" data-project-id="${project.id}" data-highlight-skill="${escapeHtml(skill)}"><img src="images/${project.image}" alt=""><span><strong>${escapeHtml(project.name)}</strong><small>${escapeHtml(project.summary)}</small></span><b>→</b></button>`).join('')}
+    </div>`;
+  projectModal.classList.add('is-open');
+  projectModal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('modal-open');
+}
+
+document.addEventListener('click', (event) => {
+  const projectButton = event.target.closest('[data-project-id]');
+  if (projectButton) {
+    openProject(projectButton.dataset.projectId, projectButton.dataset.highlightSkill || '');
+    return;
+  }
+  const skillButton = event.target.closest('[data-skill]');
+  if (skillButton) openSkill(skillButton.dataset.skill);
+  if (event.target.closest('[data-close-modal]')) closeProject();
 });
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') closeProject();
+});
+
+renderWorks();
+renderSkills();
 
 window.addEventListener('load', () => {
   if (window.location.hash === '#contact') {

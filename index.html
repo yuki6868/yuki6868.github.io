@@ -32,6 +32,7 @@
                 <li><a href="#heroContent">Top</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#works">Works</a></li>
+                <li><a href="#skills">Skills</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
         </div>
@@ -86,20 +87,10 @@
             <div id="work"></div>
         </section>
 
-        <section class="Skills">
+        <section class="Skills" id="skills">
             <div class="title">Skills</div>
-            <ol>
-                <li>Backend</li>
-                <p>Python / FastAPI</p>
-                <li>Frontend</li>
-                <p>HTML / CSS / JavaScript</p>
-                <li>Database</li>
-                <p>SQLite / MySQL</p>
-                <li>Infra</li>
-                <p>AWS</p>
-                <li>Others</li>
-                <p>Git / GitHub</p>
-            </ol>
+            <p class="section-lead">技術名ではなく、その技術を使って何を実現したかを作品と結びつけて紹介します。</p>
+            <div id="skillGrid" class="skill-grid"></div>
         </section>
 
         <section class="experience">
@@ -219,6 +210,14 @@
                 継続的にプロダクトを生み出していきます。<br>
             </p>
         </section>
+
+        <div class="project-modal" id="projectModal" aria-hidden="true">
+            <div class="project-modal-backdrop" data-close-modal></div>
+            <article class="project-modal-panel" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
+                <button class="project-modal-close" type="button" aria-label="詳細を閉じる" data-close-modal>×</button>
+                <div id="projectModalContent"></div>
+            </article>
+        </div>
 
         <section class="contact" id="contact">
             <div class="title">Contact</div>
