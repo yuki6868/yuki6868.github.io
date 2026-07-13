@@ -1,5 +1,5 @@
 const loading = document.querySelector('#loading');
-const work = document.querySelector('#work');
+const worksContent = document.querySelector('#worksContent');
 const bg = document.getElementById('bg');
 
 window.addEventListener('load', () => {
@@ -409,22 +409,82 @@ function escapeHtml(value) {
   })[character]);
 }
 
+const sectionContent = {
+  works: {
+    featured: {
+      kicker: 'FEATURED PROJECTS',
+      title: '代表作品',
+      description: '課題、設計、実装の過程まで紹介している主要なプロジェクトです。'
+    },
+    other: {
+      kicker: 'OTHER PROJECTS',
+      title: 'その他の作品',
+      description: '試作・学習・検証を通して制作したプロジェクトです。'
+    }
+  },
+  skills: {
+    primary: {
+      kicker: 'CORE SKILLS',
+      title: '主要スキル',
+      description: '代表的な開発経験につながる6つの技術です。'
+    },
+    other: {
+      kicker: 'OTHER SKILLS',
+      title: 'その他のスキル',
+      description: 'カテゴリごとにまとめています。クリックすると使用実績を確認できます。'
+    }
+  }
+};
+
+function renderGroupHeading({ kicker, title, description }, titleId) {
+  return `
+    <div class="section-group-heading">
+      <p class="section-group-kicker">${escapeHtml(kicker)}</p>
+      <h2 id="${titleId}">${escapeHtml(title)}</h2>
+      <p class="section-group-description">${escapeHtml(description)}</p>
+    </div>
+  `;
+}
+
 function renderWorks() {
-  if (!work) return;
-  work.innerHTML = projects.map((project) => `
-    <article class="work-card" data-project-id="${project.id}">
-      <button class="work-card-button" type="button" data-project-id="${project.id}" aria-label="${escapeHtml(project.name)}の詳細を見る">
-        <div class="work-card-image"><img src="images/${project.image}" alt="${escapeHtml(project.name)}"></div>
-        <div class="work-card-body">
-          <p class="work-card-kicker">Project 0${projects.indexOf(project) + 1}</p>
-          <h2>${escapeHtml(project.name)}</h2>
-          <p>${escapeHtml(project.summary)}</p>
-          <div class="tag-list">${project.skills.slice(0, 4).map((skill) => `<span>${escapeHtml(skill)}</span>`).join('')}</div>
-          <span class="work-card-link">課題と解決を見る <span aria-hidden="true">→</span></span>
-        </div>
+  if (!worksContent) return;
+
+  worksContent.innerHTML = `
+    <section class="featured-works" aria-labelledby="featuredWorksTitle">
+      ${renderGroupHeading(sectionContent.works.featured, 'featuredWorksTitle')}
+      <div id="work">
+        ${projects.map((project, index) => `
+          <article class="work-card" data-project-id="${project.id}">
+            <button class="work-card-button" type="button" data-project-id="${project.id}" aria-label="${escapeHtml(project.name)}の詳細を見る">
+              <div class="work-card-image"><img src="images/${project.image}" alt="${escapeHtml(project.name)}"></div>
+              <div class="work-card-body">
+                <p class="work-card-kicker">Project ${String(index + 1).padStart(2, '0')}</p>
+                <h3>${escapeHtml(project.name)}</h3>
+                <p>${escapeHtml(project.summary)}</p>
+                <div class="tag-list">${project.skills.slice(0, 4).map((skill) => `<span>${escapeHtml(skill)}</span>`).join('')}</div>
+                <span class="work-card-link">課題と解決を見る <span aria-hidden="true">→</span></span>
+              </div>
+            </button>
+          </article>
+        `).join('')}
+      </div>
+    </section>
+
+    <section class="other-works" aria-labelledby="otherWorksTitle">
+      ${renderGroupHeading(sectionContent.works.other, 'otherWorksTitle')}
+      <div id="otherWorksGrid" class="other-works-grid"></div>
+      <button id="otherWorksToggle" class="other-works-toggle" type="button" aria-expanded="false">
+        さらに表示
       </button>
-    </article>
-  `).join('');
+    </section>
+  `;
+
+  document.getElementById('otherWorksToggle')?.addEventListener('click', () => {
+    isOtherWorksExpanded = !isOtherWorksExpanded;
+    renderOtherWorks();
+  });
+
+  renderOtherWorks();
 }
 
 const OTHER_WORKS_INITIAL_COUNT = 6;
@@ -459,12 +519,6 @@ function renderOtherWorks() {
   toggle.textContent = isOtherWorksExpanded ? '閉じる' : `さらに表示（残り${otherProjects.length - OTHER_WORKS_INITIAL_COUNT}件）`;
   toggle.setAttribute('aria-expanded', String(isOtherWorksExpanded));
 }
-
-const otherWorksToggle = document.getElementById('otherWorksToggle');
-otherWorksToggle?.addEventListener('click', () => {
-  isOtherWorksExpanded = !isOtherWorksExpanded;
-  renderOtherWorks();
-});
 
 function getFeaturedProjectsBySkill(skill) {
   return projects.filter((project) => project.skills.includes(skill));
@@ -522,7 +576,7 @@ function renderSkillCard(name) {
 }
 
 function renderSkills() {
-  const grid = document.getElementById('skillGrid');
+  const grid = document.getElementById('skillsContent');
   if (!grid) return;
 
   const availableSkills = new Set([
@@ -554,22 +608,14 @@ function renderSkills() {
 
   grid.innerHTML = `
     <section class="primary-skills" aria-labelledby="primarySkillsTitle">
-      <div class="skills-group-heading">
-        <p>CORE SKILLS</p>
-        <h3 id="primarySkillsTitle">主要スキル</h3>
-        <span>代表的な開発経験につながる6つの技術です。</span>
-      </div>
+      ${renderGroupHeading(sectionContent.skills.primary, 'primarySkillsTitle')}
       <div class="primary-skill-grid">
         ${primarySkills.map(renderSkillCard).join('')}
       </div>
     </section>
 
     <section class="secondary-skills" aria-labelledby="secondarySkillsTitle">
-      <div class="skills-group-heading">
-        <p>OTHER SKILLS</p>
-        <h3 id="secondarySkillsTitle">その他のスキル</h3>
-        <span>カテゴリごとにまとめています。クリックすると使用実績を確認できます。</span>
-      </div>
+      ${renderGroupHeading(sectionContent.skills.other, 'secondarySkillsTitle')}
       <div class="skill-category-list">
         ${categories.map((category) => `
           <div class="skill-category">
@@ -696,7 +742,6 @@ document.addEventListener('keydown', (event) => {
 });
 
 renderWorks();
-renderOtherWorks();
 renderSkills();
 
 window.addEventListener('load', () => {
