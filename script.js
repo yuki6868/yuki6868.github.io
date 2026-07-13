@@ -276,7 +276,7 @@ const projects = [
   {
     id: 'competitive-debug-studio',
     name: 'Competitive Debug Studio',
-    image: 'wa_checker.png',
+    image: 'competitive_debug_studio.png',
     summary: '競技プログラミングのWA原因を、ランダムテストと実行分析から探すCLIツール。',
     problem: 'WAになったコードは、どの入力で間違えるのかを人手だけで特定するのが難しい。',
     approach: '正解コードと対象コードを同じ入力で実行し、出力差分が生じるケースを自動で探す仕組みを考えた。',
@@ -289,7 +289,7 @@ const projects = [
   {
     id: 'knowledge-hub',
     name: 'Knowledge Hub',
-    image: 'site_catalog.png',
+    image: 'knowledge_hub.png',
     summary: 'PCとスマートフォンで同じ知識カードを保存・閲覧できる同期型メモアプリ。',
     problem: '日々の学習や調査で得た知識を、場所や端末を問わず保存し、同じデータとして見られる環境が必要だった。',
     approach: 'Web版とデスクトップ版で別々のデータを持たず、Supabaseを共通の保存先にする構成を採用した。',
@@ -302,7 +302,7 @@ const projects = [
   {
     id: 'design-hub',
     name: 'Design Hub',
-    image: 'ai-site.png',
+    image: 'developing.png',
     summary: '分散しがちな設計情報を一元管理し、設計を思考活動として支援する開発ツール。',
     problem: 'システム開発では要件、画面、API、DBなどの設計成果物を個別に管理しやすく、変更時に整合性が崩れやすい。',
     approach: '設計書を単に作成するのではなく、共通情報を一元管理しながら、利用者が考えやすいUIを提供することを目標にした。',
@@ -702,7 +702,6 @@ function openSkill(skill) {
         <div class="skill-project-group-heading">
           <p>OTHER PROJECTS</p>
           <h3 id="otherSkillProjectsTitle">その他の使用実績</h3>
-          <span>詳細説明は省き、制作経験として簡潔に掲載しています。</span>
         </div>
         <div class="skill-other-project-list">
           ${relatedOtherProjects.map((project) => `
