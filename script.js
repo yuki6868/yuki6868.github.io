@@ -277,14 +277,14 @@ const projects = [
     id: 'competitive-debug-studio',
     name: 'Competitive Debug Studio',
     image: 'competitive_debug_studio.png',
-    summary: '競技プログラミングのWA原因を、ランダムテストと実行分析から探すCLIツール。',
+    summary: '競技プログラミングのWA原因を、ランダムテストと実行分析から探すコード分析ツール。',
     problem: 'WAになったコードは、どの入力で間違えるのかを人手だけで特定するのが難しい。',
     approach: '正解コードと対象コードを同じ入力で実行し、出力差分が生じるケースを自動で探す仕組みを考えた。',
     solution: 'ランダムテストケース生成に加えて、関数の依存関係や呼び出し回数も確認できるようにし、競技プログラミング以外のコード調査にも使える構成にした。',
     result: '失敗入力の探索とコード構造の確認を一つのCLIで行えるようにした。',
     challenges: ['ランダムテストケース生成', '関数依存関係の可視化', '呼び出し回数の計測'],
-    skills: ['Python', 'CLI', 'YAML'],
-    categories: { language: ['Python'], framework: ['なし'], database: ['なし'], infrastructure: ['CLIツール'], ai: ['なし'], other: ['YAML'] }
+    skills: ['Python', 'FastAPI', 'React', 'Vite', 'YAML'],
+    categories: { language: ['Python', 'JavaScript'], framework: ['FastAPI'], database: ['なし'], infrastructure: ['REST API'], ai: ['なし'], other: ['YAML'] }
   },
   {
     id: 'knowledge-hub',
